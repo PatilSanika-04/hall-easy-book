@@ -67,7 +67,10 @@ function Home() {
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            navigate({ to: "/halls", search: { city, guests, date: date || undefined } });
+            navigate({
+              to: "/halls",
+              search: date ? { city, guests, date } : { city, guests },
+            });
           }}
           className="mt-8 grid grid-cols-2 gap-3 rounded-[18px] bg-white/60 p-3 shadow-[0_18px_50px_-24px_rgba(15,122,99,0.5)] ring-1 ring-black/5 backdrop-blur-xl lg:grid-cols-4"
         >

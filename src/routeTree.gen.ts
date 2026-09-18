@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as HallsRouteImport } from './routes/halls'
+import { Route as HallsIndexRouteImport } from './routes/halls.index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -28,35 +29,42 @@ const HallsRoute = HallsRouteImport.update({
   path: '/halls',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HallsIndexRoute = HallsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => HallsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/halls': typeof HallsRoute
+  '/halls': typeof HallsRouteWithChildren
+  '/halls/': typeof HallsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/halls': typeof HallsRoute
+  '/halls': typeof HallsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/halls': typeof HallsRoute
+  '/halls': typeof HallsRouteWithChildren
+  '/halls/': typeof HallsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/halls'
+  fullPaths: '/' | '/auth' | '/halls' | '/halls/'
   fileRoutesByTo: FileRoutesByTo
   to: '/' | '/auth' | '/halls'
-  id: '__root__' | '/' | '/auth' | '/halls'
+  id: '__root__' | '/' | '/auth' | '/halls' | '/halls/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
-  HallsRoute: typeof HallsRoute
+  HallsRoute: typeof HallsRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -82,13 +90,30 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HallsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/halls/': {
+      id: '/halls/'
+      path: '/'
+      fullPath: '/halls/'
+      preLoaderRoute: typeof HallsIndexRouteImport
+      parentRoute: typeof HallsRoute
+    }
   }
 }
+
+interface HallsRouteChildren {
+  HallsIndexRoute: typeof HallsIndexRoute
+}
+
+const HallsRouteChildren: HallsRouteChildren = {
+  HallsIndexRoute: HallsIndexRoute,
+}
+
+const HallsRouteWithChildren = HallsRoute._addFileChildren(HallsRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
-  HallsRoute: HallsRoute,
+  HallsRoute: HallsRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

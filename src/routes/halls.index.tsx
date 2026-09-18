@@ -13,7 +13,7 @@ import {
   type Hall,
 } from "@/lib/venue";
 
-type Search = { city?: string; guests?: number; date?: string };
+type Search = { city?: string | undefined; guests?: number | undefined; date?: string | undefined };
 
 export const Route = createFileRoute("/halls/")({
   validateSearch: (search: Record<string, unknown>): Search => ({
