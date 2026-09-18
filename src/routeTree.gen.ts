@@ -10,33 +10,105 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as HallsRouteImport } from './routes/halls'
+import { Route as AuthenticatedBookingsRouteImport } from './routes/_authenticated/bookings'
+import { Route as AuthenticatedOwnerRouteImport } from './routes/_authenticated/owner'
+import { Route as HallsIndexRouteImport } from './routes/halls.index'
+import { Route as HallsIdRouteImport } from './routes/halls.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HallsRoute = HallsRouteImport.update({
+  id: '/halls',
+  path: '/halls',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedBookingsRoute = AuthenticatedBookingsRouteImport.update({
+  id: '/bookings',
+  path: '/bookings',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedOwnerRoute = AuthenticatedOwnerRouteImport.update({
+  id: '/owner',
+  path: '/owner',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const HallsIndexRoute = HallsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => HallsRoute,
+} as any)
+const HallsIdRoute = HallsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => HallsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/halls': typeof HallsRouteWithChildren
+  '/bookings': typeof AuthenticatedBookingsRoute
+  '/owner': typeof AuthenticatedOwnerRoute
+  '/halls/$id': typeof HallsIdRoute
+  '/halls/': typeof HallsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/bookings': typeof AuthenticatedBookingsRoute
+  '/owner': typeof AuthenticatedOwnerRoute
+  '/halls/$id': typeof HallsIdRoute
+  '/halls': typeof HallsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/halls': typeof HallsRouteWithChildren
+  '/_authenticated/bookings': typeof AuthenticatedBookingsRoute
+  '/_authenticated/owner': typeof AuthenticatedOwnerRoute
+  '/halls/$id': typeof HallsIdRoute
+  '/halls/': typeof HallsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    '/' | '/auth' | '/halls' | '/bookings' | '/owner' | '/halls/$id' | '/halls/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/auth' | '/bookings' | '/owner' | '/halls/$id' | '/halls'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/halls'
+    | '/_authenticated/bookings'
+    | '/_authenticated/owner'
+    | '/halls/$id'
+    | '/halls/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
+  HallsRoute: typeof HallsRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +120,88 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/halls': {
+      id: '/halls'
+      path: '/halls'
+      fullPath: '/halls'
+      preLoaderRoute: typeof HallsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/bookings': {
+      id: '/_authenticated/bookings'
+      path: '/bookings'
+      fullPath: '/bookings'
+      preLoaderRoute: typeof AuthenticatedBookingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/owner': {
+      id: '/_authenticated/owner'
+      path: '/owner'
+      fullPath: '/owner'
+      preLoaderRoute: typeof AuthenticatedOwnerRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/halls/': {
+      id: '/halls/'
+      path: '/'
+      fullPath: '/halls/'
+      preLoaderRoute: typeof HallsIndexRouteImport
+      parentRoute: typeof HallsRoute
+    }
+    '/halls/$id': {
+      id: '/halls/$id'
+      path: '/$id'
+      fullPath: '/halls/$id'
+      preLoaderRoute: typeof HallsIdRouteImport
+      parentRoute: typeof HallsRoute
+    }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedBookingsRoute: typeof AuthenticatedBookingsRoute
+  AuthenticatedOwnerRoute: typeof AuthenticatedOwnerRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedBookingsRoute: AuthenticatedBookingsRoute,
+  AuthenticatedOwnerRoute: AuthenticatedOwnerRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
+interface HallsRouteChildren {
+  HallsIdRoute: typeof HallsIdRoute
+  HallsIndexRoute: typeof HallsIndexRoute
+}
+
+const HallsRouteChildren: HallsRouteChildren = {
+  HallsIdRoute: HallsIdRoute,
+  HallsIndexRoute: HallsIndexRoute,
+}
+
+const HallsRouteWithChildren = HallsRoute._addFileChildren(HallsRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
+  HallsRoute: HallsRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
