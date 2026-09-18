@@ -110,7 +110,10 @@ function OwnerDashboard() {
 
   async function setStatus(booking: OwnerBooking, status: "confirmed" | "rejected") {
     const { error } = await supabase.from("bookings").update({ status }).eq("id", booking.id);
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast.success(status === "confirmed" ? "Booking accepted." : "Booking declined.");
     queryClient.invalidateQueries({ queryKey: ["owner-bookings", user?.id] });
   }
@@ -301,7 +304,10 @@ function OwnerHalls({ halls }: { halls: Hall[] }) {
   async function addHall(e: React.FormEvent) {
     e.preventDefault();
     const { error } = await supabase.from("halls").insert({ ...form, owner_id: user!.id });
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast.success("Hall listed.");
     setOpen(false);
     refresh();
@@ -312,28 +318,43 @@ function OwnerHalls({ halls }: { halls: Hall[] }) {
       .from("halls")
       .update({ is_active: !hall.is_active })
       .eq("id", hall.id);
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     refresh();
   }
 
   async function addService(hallId: string) {
     const draft = serviceDraft[hallId];
-    if (!draft?.name) return toast.error("Give the service a name.");
+    if (!draft?.name) {
+      toast.error("Give the service a name.");
+      return;
+    }
     const { error } = await supabase
       .from("hall_services")
       .insert({ hall_id: hallId, name: draft.name, price: Number(draft.price) || 0, unit: "flat" });
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     setServiceDraft({ ...serviceDraft, [hallId]: { name: "", price: "" } });
     refresh();
   }
 
   async function addBlackout(hallId: string) {
     const date = blockDraft[hallId];
-    if (!date) return toast.error("Pick a date to block.");
+    if (!date) {
+      toast.error("Pick a date to block.");
+      return;
+    }
     const { error } = await supabase
       .from("hall_blackouts")
       .insert({ hall_id: hallId, blocked_date: date });
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     setBlockDraft({ ...blockDraft, [hallId]: "" });
     refresh();
   }

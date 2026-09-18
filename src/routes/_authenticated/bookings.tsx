@@ -75,7 +75,10 @@ function MyBookings() {
       .from("bookings")
       .update({ payment_status: "paid" })
       .eq("id", booking.id);
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast.success("Payment recorded. Your booking is confirmed.");
     queryClient.invalidateQueries({ queryKey: ["my-bookings", user?.id] });
   }
@@ -85,7 +88,10 @@ function MyBookings() {
       .from("bookings")
       .update({ status: "cancelled" })
       .eq("id", booking.id);
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast.success("Booking cancelled.");
     queryClient.invalidateQueries({ queryKey: ["my-bookings", user?.id] });
   }
@@ -98,7 +104,10 @@ function MyBookings() {
       rating,
       comment,
     });
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast.success("Thanks for your review.");
     setReviewFor(null);
     setComment("");
